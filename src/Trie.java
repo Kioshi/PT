@@ -93,10 +93,9 @@ class Node
             String ne = n.substring(0,i);
             if (prefix.length() - ne.length() == 0)
                 continue;
-            if (key.indexOf(ne) == 0)
+            if (key.indexOf(ne) == 0 && prefix.length() >= ne.length())
             {
                 Node node = new Node(ne, values, childs);
-                node.trim(ne);
                 prefix = prefix.substring(ne.length());
                 values.clear();
                 if (value != null)
@@ -109,12 +108,6 @@ class Node
             }
         }
         return false;
-    }
-
-    private void trim(String t)
-    {
-        for (Node child : childs)
-            child.prefix = child.prefix.substring(t.length());
     }
 
     ArrayList<Integer> find(String key, String curr)

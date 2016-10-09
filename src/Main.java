@@ -1,16 +1,37 @@
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+
 public class Main {
 
     public static void main(String[] args)
     {
-	// write your code here
         Trie trie = new Trie();
+        try (Stream<String> lines = Files.lines(Paths.get("small.txt"), Charset.defaultCharset())) {
+            lines.forEachOrdered(line -> parseLine(line,trie));
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        // write your code here
         trie.print();
         trie.insert("a");
-        trie.insert("aa",1);
-        trie.insert("ab",2);
-        trie.insert("ab",3);
-        trie.insert("aba",3);
+        trie.insert("ab",1);
+        trie.insert("abc",2);
+        trie.insert("abcd",3);
+        trie.insert("abce",3);
         trie.insert("b");
+        trie.insert("acdb");
         trie.print();
+    }
+
+    public static void parseLine(String line,Trie trie)
+    {
+        String[] words = line.replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+");
+        System.out.println(line);
+        for (String world : words)
+            trie.insert(world);
     }
 }
