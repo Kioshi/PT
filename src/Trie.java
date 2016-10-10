@@ -1,17 +1,26 @@
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Stepan on 7.10.2016.
  */
 public class Trie
 {
+    boolean showStats;
     Node root = new Node("",null);
+    long startTime;
+
+    public Trie(boolean showStats)
+    {
+        this.showStats = showStats;
+    }
 
     void insert(String key)
     {
         if (key.length() == 0)
             return;
         root.insert(key,null,"");
+
     }
 
     void insert(String key, int value)
@@ -21,7 +30,24 @@ public class Trie
 
     ArrayList<Integer> find(String key)
     {
-        return root.find(key, "");
+        startTime = System.nanoTime();
+        ArrayList<Integer> list = root.find(key, "");
+        if (showStats)
+            System.out.println("Find exec time: "+TimeUnit.MILLISECONDS.convert((System.nanoTime() - startTime), TimeUnit.NANOSECONDS));
+        return list;
+    }
+    ArrayList<String> getWorlds()
+    {
+        startTime = System.nanoTime();
+        ArrayList<String> list = root.getWorld("");
+        if (showStats)
+            System.out.println("Get exec time: "+ TimeUnit.MILLISECONDS.convert((System.nanoTime() - startTime), TimeUnit.NANOSECONDS));
+        return list;
+    }
+
+    int getMaxDepth()
+    {
+        return root.getMaxDepth(0);
     }
 
     void clearValues()
@@ -40,21 +66,27 @@ class Node
 {
     String prefix;
     ArrayList<Node> childs = new ArrayList<>();
-    ArrayList<Integer> values = new ArrayList<>();;
+    ArrayList<Integer> values;
 
     public Node(String prefix, Integer value)
     {
+        this.prefix = prefix;
+        if (prefix.length() == 0)
+            return;
+        values = new ArrayList<>();
         if (value != null)
             values.add(value);
-        this.prefix = prefix;
     }
 
     public Node(String prefix, ArrayList<Integer> values, ArrayList<Node> childs)
     {
         this.prefix = prefix;
-        this.values = new ArrayList<>();
-        for (int v : values)
-            this.values.add(v);
+        if (values != null)
+        {
+            this.values = new ArrayList<>();
+            for (int v : values)
+                this.values.add(v);
+        }
         this.childs = new ArrayList<>();
         for (Node c : childs)
             this.childs.add(c);
@@ -68,7 +100,7 @@ class Node
             if (key.length() == n.length())
             {
                 if (value != null)
-                    values.add(value);
+                    addValue(value);
                 return true;
             }
             else if (key.length() < n.length())
@@ -76,8 +108,7 @@ class Node
                 Node node = new Node(prefix, values, childs);
                 prefix = key.substring(curr.length());
                 values.clear();
-                if (value != null)
-                    values.add(value);
+                addValue(value);
                 childs.clear();
                 childs.add(node);
                 return true;
@@ -97,9 +128,7 @@ class Node
             {
                 Node node = new Node(n.substring(ne.length()), values, childs);
                 prefix = ne;
-                values.clear();
-                if (value != null)
-                    values.add(value);
+                values = null;
                 childs.clear();
                 childs.add(node);
                 if (prefix.length() == key.length())
@@ -117,6 +146,8 @@ class Node
 
     private void addValue(Integer value)
     {
+        if (values == null)
+            values = new ArrayList<>();
         if (value != null)
             values.add(value);
     }
@@ -141,7 +172,8 @@ class Node
 
     public void clear()
     {
-        values.clear();
+        if (values != null)
+            values.clear();
         for (Node node : childs)
             node.clear();
     }
@@ -154,13 +186,40 @@ class Node
         if (floor > 0)
         {
             System.out.print("-" + prefix);
-            if (values.size() > 0)
-                System.out.print(" : ");
-            for (int i : values)
-                System.out.print(i+" ");
+            if (values != null )
+            {
+                if (values.size() > 0)
+                    System.out.print(" : ");
+                for (int i : values)
+                    System.out.print(i + " ");
+            }
             System.out.println();
         }
         for (Node child: childs)
             child.print(floor+1);
+    }
+
+    ArrayList<String> getWorld(String curr)
+    {
+        ArrayList<String> list = new ArrayList<>();
+        String word = curr + prefix;
+        if (values != null)
+            list.add(word);
+
+        for (Node child : childs)
+        {
+            ArrayList<String> res = child.getWorld(word);
+            if (res.size() != 0)
+                list.addAll(res);
+        }
+        return list;
+    }
+
+    public int getMaxDepth(int depth)
+    {
+        int d = depth;
+        for (Node child:childs)
+            d = Math.max(d, child.getMaxDepth(depth + 1));
+        return d;
     }
 }
