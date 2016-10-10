@@ -1,5 +1,12 @@
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 /**
  * Created by Stepan on 7.10.2016.
@@ -57,8 +64,42 @@ public class Trie
 
     void print()
     {
+        print(System.out);
+    }
+
+    void print(PrintStream ps)
+    {
         int floor = 0;
-        root.print(floor);
+        root.print(floor,ps);
+    }
+
+    public void load(String s)
+    {
+        int floor = 0;
+        try (Stream<String> lines = Files.lines(Paths.get(s), Charset.defaultCharset())) {
+            lines.forEachOrdered(line ->
+            {
+                int vIndex = line.indexOf(':');
+                int pIndex = line.indexOf('-');
+                ArrayList<Integer> values = null;
+                String prefix;
+                if (vIndex == -1)
+                    prefix = line.substring(pIndex+1);
+                else
+                {
+                    prefix = line.substring(pIndex + 1, vIndex);
+                    Scanner scanner = new Scanner(line.substring(vIndex+1));
+                    values = new ArrayList<>();
+                    while (scanner.hasNextInt())
+                        values.add(scanner.nextInt());
+                }
+
+                root.load(prefix,values, 1, pIndex);
+            });
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 }
 
@@ -178,25 +219,24 @@ class Node
             node.clear();
     }
 
-    public void print(int floor)
+    public void print(int floor, PrintStream ps)
     {
         for (int i=0;i<floor;i++)
-            System.out.print("|");
+            ps.print("|");
 
         if (floor > 0)
         {
-            System.out.print("-" + prefix);
+            ps.print("-" + prefix);
             if (values != null )
             {
-                if (values.size() > 0)
-                    System.out.print(" : ");
+                ps.print(":");
                 for (int i : values)
-                    System.out.print(i + " ");
+                    ps.print(i + " ");
             }
-            System.out.println();
+            ps.println();
         }
         for (Node child: childs)
-            child.print(floor+1);
+            child.print(floor+1, ps);
     }
 
     ArrayList<String> getWorld(String curr)
@@ -221,5 +261,15 @@ class Node
         for (Node child:childs)
             d = Math.max(d, child.getMaxDepth(depth + 1));
         return d;
+    }
+
+    public void load(String prefix, ArrayList<Integer> values, int i, int pIndex)
+    {
+        if (i >= pIndex)
+        {
+            childs.add(new Node(prefix, values, new ArrayList<Node>()));
+            return;
+        }
+        childs.get(childs.size() - 1).load(prefix,values, i+1, pIndex);
     }
 }

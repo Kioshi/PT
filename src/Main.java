@@ -1,4 +1,6 @@
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -7,10 +9,10 @@ import java.util.stream.Stream;
 
 public class Main {
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws FileNotFoundException
     {
         Trie trie = new Trie(true);
-
+        // nacitanej soubor: 1079293 slov 6344520 Bytu load time 7221 ms
         long startTime = System.nanoTime();
         try (Stream<String> lines = Files.lines(Paths.get("big.txt"), Charset.defaultCharset())) {
             lines.forEachOrdered(line -> parseLine(line,trie));
@@ -18,18 +20,21 @@ public class Main {
         {
             e.printStackTrace();
         }
-
+        //*/
+        //trie.load("out1.txt"); // 328130 Bytu load time 607ms
         System.out.println("Create exec time: "+ TimeUnit.MILLISECONDS.convert((System.nanoTime() - startTime), TimeUnit.NANOSECONDS));
         //*/
         //trie.print();
-        trie.getWorlds();
-        trie.find("umpaluma");
+        System.out.println("Uniq words: "+trie.getWorlds().size());
         System.out.println("Max depth: "+trie.getMaxDepth());
+        //trie.print();
+        trie.print(new PrintStream("out.txt"));
     }
 
     public static void parseLine(String line,Trie trie)
     {
         String[] words = line.replaceAll("[^a-zA-Z ]", " ").toLowerCase().split("\\s+");
+        //System.out.println(line);
         for (String world : words)
             trie.insert(world);
     }
