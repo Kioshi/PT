@@ -88,21 +88,19 @@ class Node
             return true;
         }
 
-        for (int i = n.length() - 1; i > 0; i--)
+        for (int i = prefix.length() - 1; i > 0; i--)
         {
-            String ne = n.substring(0,i);
-            if (prefix.length() - ne.length() == 0)
-                continue;
+            String ne = prefix.substring(0,i);
             if (key.indexOf(ne) == 0 && prefix.length() >= ne.length())
             {
-                Node node = new Node(ne, values, childs);
-                prefix = prefix.substring(ne.length());
+                Node node = new Node(n.substring(ne.length()), values, childs);
+                prefix = ne;
                 values.clear();
                 if (value != null)
                     values.add(value);
                 childs.clear();
                 childs.add(node);
-                Node newOne = new Node(key.substring(ne.length()),value);
+                Node newOne = new Node(key.substring(curr.length()+prefix.length()),value);
                 childs.add(newOne);
                 return true;
             }

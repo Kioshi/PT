@@ -17,6 +17,7 @@ public class Main {
         }
         // write your code here
         trie.print();
+        /*
         trie.insert("a");
         trie.insert("ab",1);
         trie.insert("abc",2);
@@ -24,7 +25,7 @@ public class Main {
         trie.insert("abce",3);
         trie.insert("b");
         trie.insert("acdb");
-        trie.print();
+        trie.print();*/
     }
 
     public static void parseLine(String line,Trie trie)
