@@ -9,29 +9,34 @@ public class Main {
     public static void main(String[] args)
     {
         Trie trie = new Trie();
-        try (Stream<String> lines = Files.lines(Paths.get("small.txt"), Charset.defaultCharset())) {
+
+        try (Stream<String> lines = Files.lines(Paths.get("big.txt"), Charset.defaultCharset())) {
             lines.forEachOrdered(line -> parseLine(line,trie));
         } catch (IOException e)
         {
             e.printStackTrace();
         }
-        // write your code here
+        //*/
         trie.print();
-        /*
+/*
         trie.insert("a");
         trie.insert("ab",1);
         trie.insert("abc",2);
         trie.insert("abcd",3);
         trie.insert("abce",3);
         trie.insert("b");
+        trie.insert("bb");
+        trie.insert("a");
+        trie.insert("a");
         trie.insert("acdb");
-        trie.print();*/
+        trie.print();
+        //*/
     }
 
     public static void parseLine(String line,Trie trie)
     {
-        String[] words = line.replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+");
-        System.out.println(line);
+        String[] words = line.replaceAll("[^a-zA-Z ]", " ").replaceAll("  "," ").toLowerCase().split("\\s+");
+        //System.out.println(line);
         for (String world : words)
             trie.insert(world);
     }

@@ -9,6 +9,8 @@ public class Trie
 
     void insert(String key)
     {
+        if (key.length() == 0)
+            return;
         root.insert(key,null,"");
     }
 
@@ -88,10 +90,10 @@ class Node
             return true;
         }
 
-        for (int i = prefix.length() - 1; i > 0; i--)
+        for (int i = prefix.length(); i > 0; i--)
         {
             String ne = prefix.substring(0,i);
-            if (key.indexOf(ne) == 0 && prefix.length() >= ne.length())
+            if (key.indexOf(ne) == 0 && prefix.length() > ne.length())
             {
                 Node node = new Node(n.substring(ne.length()), values, childs);
                 prefix = ne;
@@ -100,12 +102,23 @@ class Node
                     values.add(value);
                 childs.clear();
                 childs.add(node);
-                Node newOne = new Node(key.substring(curr.length()+prefix.length()),value);
+                if (prefix.length() == key.length())
+                {
+                    addValue(value);
+                    return true;
+                }
+                Node newOne = new Node(key.substring(prefix.length()), value);
                 childs.add(newOne);
                 return true;
             }
         }
         return false;
+    }
+
+    private void addValue(Integer value)
+    {
+        if (value != null)
+            values.add(value);
     }
 
     ArrayList<Integer> find(String key, String curr)
