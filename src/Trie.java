@@ -101,6 +101,11 @@ public class Trie
             e.printStackTrace();
         }
     }
+
+    public boolean validate()
+    {
+        return root.validate();
+    }
 }
 
 class Node
@@ -164,20 +169,20 @@ class Node
 
         for (int i = prefix.length(); i > 0; i--)
         {
-            String ne = prefix.substring(0,i);
-            if (key.indexOf(ne) == 0 && prefix.length() > ne.length())
+            String ne = curr+ prefix.substring(0,i);
+            if (key.indexOf(ne) == 0)
             {
                 Node node = new Node(n.substring(ne.length()), values, childs);
-                prefix = ne;
+                prefix = ne.substring(curr.length());
                 values = null;
                 childs.clear();
                 childs.add(node);
-                if (prefix.length() == key.length())
+                if (ne.length() == key.length())
                 {
                     addValue(value);
                     return true;
                 }
-                Node newOne = new Node(key.substring(prefix.length()), value);
+                Node newOne = new Node(key.substring(ne.length()), value);
                 childs.add(newOne);
                 return true;
             }
@@ -271,5 +276,17 @@ class Node
             return;
         }
         childs.get(childs.size() - 1).load(prefix,values, i+1, pIndex);
+    }
+
+    public boolean validate()
+    {
+        ArrayList<Character> chars = new ArrayList<>();
+        for (Node child: childs)
+        {
+            if (!child.validate()|| chars.contains(child.prefix.charAt(0)))
+                return false;
+            chars.add(child.prefix.charAt(0));
+        }
+        return true;
     }
 }
