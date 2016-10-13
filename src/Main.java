@@ -22,7 +22,7 @@ public class Main {
         //trie.print();
         System.out.println("Uniq words: "+trie.getWorlds().size());
         System.out.println("Max depth: "+trie.getMaxDepth());
-        trie.print();
+        //trie.print();
         System.out.println(trie.validate());
         //trie.print(new PrintStream("out.txt"));
     }
