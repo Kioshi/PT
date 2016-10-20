@@ -20,15 +20,18 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Created by user on 19.10.2016.
  */
 public class GUI {
-    public static Stage primaryStage;
-    public static TextArea taText;
-    public ListView listView;
-    public TextField tfAdd;
+    private static Stage primaryStage;
+    private static TextArea taText;
+    private ListView listView;
+    private TextField tfAdd, tfSearch;
+
 
     public Scene getScene() {
         Scene scene = new Scene(getRoot());
@@ -64,11 +67,22 @@ public class GUI {
 
 
         Button buttonOpen = new Button("Open...");
-        controls.add(buttonOpen,1,2);
+        controls.add(buttonOpen,0,2);
         buttonOpen.setOnAction(event -> loadData());
 
+        Text labelDescSearch = new Text("Search: ");
+        labelDescSearch.setFont(Font.font("Arial", FontWeight.BOLD, 13));
+        controls.add(labelDescSearch,1,1);
+
+        tfSearch = new TextField();
+        controls.add(tfSearch,1,2);
+
+        Button buttonSearch = new Button("Search");
+        buttonSearch.setOnAction(event -> search());
+        controls.add(buttonSearch,2,2);
+
         Button buttonDict = new Button("Dictionary");
-        controls.add(buttonDict,2,2);
+        controls.add(buttonDict,3,2);
         buttonDict.setOnAction(event -> getDictStage());
 
         controls.setPadding(new Insets(5));
@@ -131,12 +145,12 @@ public class GUI {
         stageDict.setScene(getDictScene());
         stageDict.show();
     }
-    public Scene getDictScene() {
+    private Scene getDictScene() {
         Scene sceneDict = new Scene(getDictRoot());
         return sceneDict;
     }
 
-    public Parent getDictRoot(){
+    private Parent getDictRoot(){
         BorderPane rootDictPane = new BorderPane();
         rootDictPane.setCenter(seznam());
         rootDictPane.setBottom(ovladaciPanel());
@@ -147,17 +161,6 @@ public class GUI {
         GridPane paneDictControl = new GridPane();
         paneDictControl.setHgap(10);
         paneDictControl.setVgap(10);
-
-        Text labelDescSearch = new Text("Search: ");
-        labelDescSearch.setFont(Font.font("Arial", FontWeight.BOLD, 13));
-        paneDictControl.add(labelDescSearch,1,1);
-
-        TextField tfSearch = new TextField();
-        paneDictControl.add(tfSearch,1,2);
-
-        Button buttonSearch = new Button("Search");
-
-        paneDictControl.add(buttonSearch,2,2);
 
         Text labelDescAdd = new Text("Add word: ");
         labelDescAdd.setFont(Font.font("Arial", FontWeight.BOLD, 13));
@@ -188,5 +191,18 @@ public class GUI {
         return listView;
     }
 
- 
+    private void search(){
+        ObservableList<String>simWords = FXCollections.observableArrayList();
+        ListView<String>words = new ListView<>();
+                String sWord = tfSearch.getText();
+        if (Objects.equals(sWord, "")){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Slovo nenalezeno");
+            alert.setHeaderText("Toto slovo nebylo nalezeno. Zde jsou nejbližší slova.");
+            alert.setGraphic(new ListView<>(simWords));
+            alert.showAndWait();
+        }
+
+
+    }
 }
