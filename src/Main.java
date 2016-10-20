@@ -1,12 +1,16 @@
+import javafx.application.Application;
+import javafx.stage.Stage;
+
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-public class Main {
+public class Main extends Application{
 
     public static void main(String[] args) throws FileNotFoundException
     {
+        launch(args);
         Trie trie = new Trie(true);
         // nacitanej soubor: 1079293 slov 6344520 Bytu load time 7221 ms
         long startTime = System.nanoTime();
@@ -57,6 +61,19 @@ public class Main {
         for (String world : words)
             trie.insert(world);
     }
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        GUI gui = new GUI();
+
+        primaryStage.setTitle("PT");
+        primaryStage.setScene(gui.getScene());
+
+        primaryStage.setMinHeight(300);
+        primaryStage.setMinWidth(400);
+        primaryStage.show();
+    }
+
 }
 
 class ValueComparator implements Comparator<String>
