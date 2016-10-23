@@ -2,39 +2,43 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
-
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.fxmisc.richtext.StyleClassedTextArea;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
 
 /**
  * Created by user on 19.10.2016.
  */
 public class GUI {
     private static Stage primaryStage;
-    private static TextArea taText;
+    private Stage stageDict;
+    private static StyleClassedTextArea taText;
     private ListView listView;
     private TextField tfAdd, tfSearch;
+    private File dictFile;
+    Trie trie = new Trie();
 
 
     public Scene getScene() {
         Scene scene = new Scene(getRoot());
+        scene.getStylesheets().add("style.css");
         return scene;
     }
 
@@ -52,10 +56,11 @@ public class GUI {
     }
 
     private Node getText() {
-        taText = new TextArea("You can write here ...");
-        taText.setPrefColumnCount(30);
+        taText = new StyleClassedTextArea();
+        //taText.setParagraphGraphicFactory(LineNumberFactory);
+  /*      taText.setPrefColumnCount(30);
         taText.setPrefRowCount(30);
-
+*/
         taText.maxWidth(100);
         return taText;
     }
@@ -65,24 +70,20 @@ public class GUI {
         controls.setHgap(10);
         controls.setVgap(10);
 
-
-        Button buttonOpen = new Button("Open...");
-        controls.add(buttonOpen,0,2);
-        buttonOpen.setOnAction(event -> loadData());
-
+        /*
         Text labelDescSearch = new Text("Search: ");
         labelDescSearch.setFont(Font.font("Arial", FontWeight.BOLD, 13));
         controls.add(labelDescSearch,1,1);
-
+        */
         tfSearch = new TextField();
-        controls.add(tfSearch,1,2);
+        controls.add(tfSearch,1,1);
 
         Button buttonSearch = new Button("Search");
         buttonSearch.setOnAction(event -> search());
-        controls.add(buttonSearch,2,2);
+        controls.add(buttonSearch,2,1);
 
         Button buttonDict = new Button("Dictionary");
-        controls.add(buttonDict,3,2);
+        controls.add(buttonDict,3,1);
         buttonDict.setOnAction(event -> getDictStage());
 
         controls.setPadding(new Insets(5));
@@ -95,7 +96,19 @@ public class GUI {
     private void loadData() {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(primaryStage);
-        if (file != null) {
+        if (file != null)
+        {
+            Executors.newSingleThreadExecutor().submit(() ->
+            {
+                if (file.getName().matches(".*\\.dic$"))
+                {
+                    trie.load(file);
+                    dictFile = file;
+                }
+                else
+                    trie.create(file);
+            });
+            /*
             String data = loadFile(file);
             if ((data != null) && (data.length() > 0)) {
                 taText.setText(data);
@@ -105,16 +118,17 @@ public class GUI {
                 alert.setTitle("Loading error");
                 alert.setHeaderText("ERROR!");
                 alert.showAndWait();
-            }
+            }*/
         }
     }
-
+/*
     private String loadFile(File file) {
         ObservableList<String> newData = FXCollections.observableArrayList();
         String data;
         if (file == null) {
             return null;
         } else {
+
             FileReader reader;
             BufferedReader input;
             try {
@@ -136,11 +150,11 @@ public class GUI {
         }
 
     }
-
+*/
     private void getDictStage()
     {
 
-        Stage stageDict = new Stage();
+        stageDict = new Stage();
         stageDict.setTitle("Dictionary");
         stageDict.setScene(getDictScene());
         stageDict.show();
@@ -154,7 +168,35 @@ public class GUI {
         BorderPane rootDictPane = new BorderPane();
         rootDictPane.setCenter(seznam());
         rootDictPane.setBottom(ovladaciPanel());
+        rootDictPane.setTop(newMenu());
         return rootDictPane;
+    }
+
+    private Node newMenu()
+    {
+        MenuBar menuBar = new MenuBar();
+        Menu menuFile = new Menu("File");
+        MenuItem open = new MenuItem("Open");
+        MenuItem save = new MenuItem("Save");
+        MenuItem saveAs = new MenuItem("Save As");
+
+        //Button buttonOpen = new Button("Open...");
+        //paneDictControl.add(buttonOpen,0,1);
+        open.setOnAction(event -> loadData());
+
+
+        //Button buttonSave = new Button("Save");
+        //buttonSave.add(buttonSave,1,1);
+        save.setOnAction(event -> save(false));
+
+        //Button buttonSaveAs = new Button("Save As");
+        //paneDictControl.add(buttonSaveAs,2,1);
+        saveAs.setOnAction(event -> save(true));
+
+        menuFile.getItems().addAll(open,save,saveAs);
+        menuBar.getMenus().addAll(menuFile);
+
+        return menuBar;
     }
 
     private Node ovladaciPanel() {
@@ -162,24 +204,43 @@ public class GUI {
         paneDictControl.setHgap(10);
         paneDictControl.setVgap(10);
 
-        Text labelDescAdd = new Text("Add word: ");
+        /*Text labelDescAdd = new Text("Add word: ");
         labelDescAdd.setFont(Font.font("Arial", FontWeight.BOLD, 13));
-        paneDictControl.add(labelDescAdd,3,1);
+        paneDictControl.add(labelDescAdd,3,1);*/
 
         tfAdd = new TextField();
-        paneDictControl.add(tfAdd,3,2);
+        paneDictControl.add(tfAdd,0,2);
 
         Button buttonAdd = new Button("Add word");
-        buttonAdd.setOnAction(event -> listView.getItems().add(tfAdd.getText()));
-        paneDictControl.add(buttonAdd,4,2);
-
-        Button buttonSave = new Button("Save");
-
-        paneDictControl.add(buttonSave,5,2);
+        buttonAdd.setOnAction(event ->
+        {
+            if (!tfAdd.getText().isEmpty())
+                trie.insert(tfAdd.getText());
+            //listView.getItems().add(tfAdd.getText())
+        });
+        paneDictControl.add(buttonAdd,1,2);
 
         paneDictControl.setPadding(new Insets(5));
         paneDictControl.setAlignment(Pos.CENTER);
         return paneDictControl;
+    }
+
+    private void save(boolean saveAs)
+    {
+        if (dictFile == null || saveAs)
+        {
+            FileChooser fileChooser = new FileChooser();
+            File dictFile = fileChooser.showOpenDialog(stageDict);
+            if (dictFile == null)
+                return;
+        }
+        try
+        {
+            trie.print(new PrintStream(new FileOutputStream(dictFile)));
+        } catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private ListView seznam() {
@@ -191,18 +252,86 @@ public class GUI {
         return listView;
     }
 
-    private void search(){
-        ObservableList<String>simWords = FXCollections.observableArrayList();
-        ListView<String>words = new ListView<>();
-                String sWord = tfSearch.getText();
-        if (Objects.equals(sWord, "")){
+    private void search()
+    {
+        String string = tfSearch.getText();
+        if (string.isEmpty())
+            return;
+
+
+        String text = taText.getText().replaceAll("[^a-zA-Z ]", " ").toLowerCase();
+        int start = -1;
+        int end = -1;
+        for (int i = 0; i < text.length(); i++)
+        {
+            if (text.charAt(i) == ' ')
+            {
+                if (end != -1 && end == i-1)
+                {
+                    System.out.println(text.substring(start,end+1) +" "+start);
+                    trie.insert(text.substring(start,end+1),start);
+                }
+
+                start = -1;
+                end = -1;
+                continue;
+            }
+
+            if (start == -1)
+                start = i;
+            end = i;
+        }
+
+        if (end != -1 && end == text.length()-1)
+        {
+            System.out.println(text.substring(start,end+1) +" "+start);
+            trie.insert(text.substring(start,end+1),start);
+        }
+
+        ArrayList<Integer> indexes = trie.find(string);
+        taText.clearStyle(0,taText.getLength());
+        //ArrayList<String> style = new ArrayList<>();
+        //style.add("-fx-fill: \"red\"");
+        if (indexes != null)
+        {
+            //hajlajt
+            for (int index : indexes)
+            {
+                System.out.println(index);
+                taText.setStyle(index, index+string.length(), Arrays.asList("bold"));
+
+               // taText.g
+            }
+        }
+        else
+        {
+            ArrayList<String> words = trie.getWorlds();
+
+            ConcurrentHashMap<String,Integer> map = new ConcurrentHashMap<>(words.size());
+            words.stream().parallel().forEach(s -> map.put(s,Levenshtein.distance(s,string)));
+
+            TreeMap<String, Integer> sorted_map = new TreeMap<String, Integer>((a, b) ->
+            {
+                if (map.get(a) < map.get(b))
+                    return -1;
+                else
+                    return 1;
+            });
+            sorted_map.putAll(map);
+
+            ObservableList<String> simWords = FXCollections.observableArrayList();
+            for(Map.Entry<String, Integer> pair: sorted_map.entrySet())
+            {
+                if(simWords.size() >= 10)
+                    break;
+                simWords.add(pair.getKey());
+            }
+
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Slovo nenalezeno");
-            alert.setHeaderText("Toto slovo nebylo nalezeno. Zde jsou nejbližší slova.");
+            alert.setTitle("Word not found in text");
+            alert.setHeaderText("World "+string+" was not found in text. Here are most similiar words from dictionary");
             alert.setGraphic(new ListView<>(simWords));
             alert.showAndWait();
         }
-
-
     }
 }

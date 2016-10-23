@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
@@ -5,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 /**
@@ -13,53 +14,47 @@ import java.util.stream.Stream;
  */
 public class Trie
 {
-    boolean showStats;
     Node root = new Node("",null);
-    long startTime;
-
-    public Trie(boolean showStats)
-    {
-        this.showStats = showStats;
-    }
+    ReentrantLock lock = new ReentrantLock();
+    //ReentrantLock fileLock = new ReentrantLock();
 
     void insert(String key)
     {
         if (key.length() == 0)
             return;
+        lock.lock();
         root.insert(key,null,"");
-
+        lock.unlock();
     }
 
     void insert(String key, int value)
     {
+        lock.lock();
         root.insert(key, value, "");
+        lock.unlock();
     }
 
     ArrayList<Integer> find(String key)
     {
-        startTime = System.nanoTime();
+        lock.lock();
         ArrayList<Integer> list = root.find(key, "");
-        if (showStats)
-            System.out.println("Find exec time: "+TimeUnit.MILLISECONDS.convert((System.nanoTime() - startTime), TimeUnit.NANOSECONDS));
+        lock.unlock();
         return list;
     }
     ArrayList<String> getWorlds()
     {
-        startTime = System.nanoTime();
+        lock.lock();
         ArrayList<String> list = root.getWorld("");
-        if (showStats)
-            System.out.println("Get exec time: "+ TimeUnit.MILLISECONDS.convert((System.nanoTime() - startTime), TimeUnit.NANOSECONDS));
+        lock.unlock();
         return list;
     }
 
-    int getMaxDepth()
-    {
-        return root.getMaxDepth(0);
-    }
 
     void clearValues()
     {
+        lock.lock();
         root.clear();
+        lock.unlock();
     }
 
     void print()
@@ -69,14 +64,18 @@ public class Trie
 
     void print(PrintStream ps)
     {
+        lock.lock();
         int floor = 0;
         root.print(floor,ps);
+        lock.unlock();
     }
 
-    public void load(String s)
+    //public void load(String s)
+    public void load(File f)
     {
+        lock.lock();
         int floor = 0;
-        try (Stream<String> lines = Files.lines(Paths.get(s), Charset.defaultCharset())) {
+        try (Stream<String> lines = Files.lines(Paths.get(f.getPath()), Charset.defaultCharset())) {
             lines.forEachOrdered(line ->
             {
                 int vIndex = line.indexOf(':');
@@ -94,17 +93,40 @@ public class Trie
                         values.add(scanner.nextInt());
                 }
 
+                //lock.lock();
                 root.load(prefix,values, 1, pIndex);
+                //lock.unlock();
             });
         } catch (IOException e)
         {
             e.printStackTrace();
         }
+        lock.unlock();
+    }
+
+    public void create(File f)
+    {
+        lock.lock();
+        try (Stream<String> lines = Files.lines(Paths.get("big.txt"), Charset.defaultCharset())) {
+            lines.forEachOrdered(line ->
+            {
+                String[] words = line.replaceAll("[^a-zA-Z ]", " ").toLowerCase().split("\\s+");
+                for (String world : words)
+                    insert(world);
+            });
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        lock.unlock();
     }
 
     public boolean validate()
     {
-        return root.validate();
+        lock.lock();
+        boolean valid = root.validate();
+        lock.unlock();
+        return valid;
     }
 }
 
