@@ -1,0 +1,16 @@
+Volba vhodné datové struktrury pro slovník
+ - Nejvhodnejší datovou strukturou bude kompaktní komprimovaná trie, která může mít i jediného následníka
+   - Kompaktní komprimovaná trie, jelikož pro případ nenalezení slova v textu potřebujeme seznam slov v trii, což nám kompaktní verze umožnuje, navíc zabírá menší datový prostor
+   - Jediný následník opět umožní menší zabraný prostor a zároveň nenaruší trii pokud poudmínkou jediného potomka je, že rodič je slovo samo o sobě
+Formát výstupu
+ - Zvolil bych klasický textový soubor, přestože binární soubor by byl menší, pro možnou jednoduchou rozšiřitelnost o různá formátování
+ - Syntax souboru navrhuji jeden node trie na řádku kdy:
+   - před nodem bude | tolikrát jako počet rodičů a - pro indikaci začátku slova
+   - bude následovat prefix nodu
+   - následně bude : jedná-li se o slovo, následovaná indexy oddělené čárkami
+ - Tato syntaxe bude dobře čitelná jak pro člověka, tak dobře parsovatelná zpět na trii
+Levenstein
+ - Metodu pro Levensteinovu vzálenost budeme implementovat iteračně, jelikož rekurzivní bude kvůli overheadu daleko pomalejší
+Zvýraznění hledaných slov
+ - Pro zvýraznění hledaných slov použijeme místo TextArea třídu StyleClassedTextArea z knihovny RichTextFX, která umožnuje nastavit konkrétní styl na místo v textu podle indexu a to je pro naše účely ideální.
+Pro grafické rozhraní programu použijeme JavaFX, jelikož s ním máme zkušenosti z předmetu UUR a při průzkumu možností zvýraznování v textu jsme narazili na zmíněnou knihovnu RichTextFX, která nám tento proces usnadní.
