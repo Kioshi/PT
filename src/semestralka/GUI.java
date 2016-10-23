@@ -27,26 +27,58 @@ import java.util.concurrent.Executors;
  *
  */
 public class GUI {
+    /**
+     * Primary stage for alert dialog
+     */
     private static Stage primaryStage;
+    /**
+     * Dictionary window stage
+     */
     private Stage stageDict;
+    /**
+     * StyleClassedTextArea node reference
+     */
     private static StyleClassedTextArea taText;
+    /**
+     * Search textfield reference
+     */
     private TextField tfSearch;
+    /**
+     * Dictionary file referance for saving
+     */
     private File dictFile;
+    /**
+     * Indicator if text was changed, to prevent unnecessary saving to dictionary on multiple searches
+     */
     private boolean textChanged = false;
+    /**
+     * Trie used for dictionary and searching
+     */
     private Trie trie = new Trie();
 
+    /**
+     * Constructor for retrieving primaryStage
+     * @param primaryStage Primary stage
+     */
     public GUI(Stage primaryStage)
     {
         GUI.primaryStage = primaryStage;
     }
 
-
+    /**
+     * Builds primaryStage scene
+     * @return Scene
+     */
     Scene getScene() {
         Scene scene = new Scene(getRoot());
         scene.getStylesheets().add("semestralka/style.css");
         return scene;
     }
 
+    /**
+     * Creates root for scene
+     * @return BorderPane root
+     */
     private Parent getRoot() {
         BorderPane rootPaneBP = new BorderPane();
 
@@ -55,6 +87,10 @@ public class GUI {
         return rootPaneBP;
     }
 
+    /**
+     * Creates main text area
+     * @return StyleClassedTextArea
+     */
     private Node getText() {
         taText = new StyleClassedTextArea();
         taText.setOnKeyTyped(event -> textChanged = true);
@@ -62,6 +98,10 @@ public class GUI {
         return taText;
     }
 
+    /**
+     * Creates bottom controll panel
+     * @return GridPane
+     */
     private Node getControl(){
         GridPane controls = new GridPane();
         controls.setHgap(10);
@@ -84,7 +124,9 @@ public class GUI {
         return controls;
     }
 
-
+    /**
+     * Show file chooser and tells trie to create or load dictionary according to file type
+     */
     private void loadData() {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(primaryStage);
@@ -102,26 +144,42 @@ public class GUI {
             });
         }
     }
+
+    /**
+     * Create dictionary stage
+     */
     private void getDictStage()
     {
-
         stageDict = new Stage();
         stageDict.setTitle("Dictionary");
         stageDict.setScene(getDictScene());
         stageDict.show();
     }
+
+    /**
+     * Create dictionary scene
+     * @return Scene
+     */
     private Scene getDictScene() {
         return new Scene(getDictRoot());
     }
 
+    /**
+     * Create dictionary root
+     * @return BorderPane
+     */
     private Parent getDictRoot(){
         BorderPane rootDictPane = new BorderPane();
-        rootDictPane.setCenter(seznam());
-        rootDictPane.setBottom(ovladaciPanel());
+        rootDictPane.setCenter(getListView());
+        rootDictPane.setBottom(dicControlPanel());
         rootDictPane.setTop(newMenu());
         return rootDictPane;
     }
 
+    /**
+     * Create dictionary menu for open, save and save as options
+     * @return MenuBar
+     */
     private Node newMenu()
     {
         MenuBar menuBar = new MenuBar();
@@ -140,7 +198,11 @@ public class GUI {
         return menuBar;
     }
 
-    private Node ovladaciPanel() {
+    /**
+     * Create dictioanry bottom control panel
+     * @return GridPane
+     */
+    private Node dicControlPanel() {
         GridPane paneDictControl = new GridPane();
         paneDictControl.setHgap(10);
         paneDictControl.setVgap(10);
@@ -161,6 +223,10 @@ public class GUI {
         return paneDictControl;
     }
 
+    /**
+     * Saves dictionary intro file
+     * @param saveAs determines if uses dictFile or show file chooser
+     */
     private void save(boolean saveAs)
     {
         if (dictFile == null || saveAs)
@@ -179,7 +245,11 @@ public class GUI {
         }
     }
 
-    private ListView seznam() {
+    /**
+     * Creates listView for center of dictionary window
+     * @return ListView
+     */
+    private ListView getListView() {
         ListView listView = new ListView<>(trie.getWords());
         listView.setEditable(false);
         BorderPane.setMargin(listView, new Insets(5));
@@ -187,6 +257,9 @@ public class GUI {
         return listView;
     }
 
+    /**
+     * Update dictionary then search for specified word and highligh them or throw alert with similiar words
+     */
     private void search()
     {
         String string = tfSearch.getText();
@@ -206,6 +279,9 @@ public class GUI {
             throwAlert(string,findSimiliar(string));
     }
 
+    /**
+     * Updates dictionary with text if textChanged is true
+     */
     private void updateDictionary()
     {
         if (!textChanged)
@@ -236,12 +312,17 @@ public class GUI {
             trie.insert(text.substring(start,end+1),start);
     }
 
+    /**
+     * Find up to 10 similiar words with Levenstein distance
+     * @param word target word
+     * @return list of similiar words
+     */
     private ObservableList<String> findSimiliar(String word)
     {
         ObservableList<String> words = trie.getWords();
 
         ConcurrentHashMap<String,Integer> map = new ConcurrentHashMap<>(words.size());
-        words.stream().parallel().forEach(s -> map.put(s,Levenshtein.distance(s,word)));
+        words.stream().parallel().forEach(s -> map.put(s, Levenstein.distance(s,word)));
 
         TreeMap<String, Integer> sorted_map = new TreeMap<>((a, b) ->
         {
@@ -263,6 +344,11 @@ public class GUI {
         return simWords;
     }
 
+    /**
+     * Show alert dialog when word wasnt in text, with list of similiar words in dictionary
+     * @param string Word user was looking for
+     * @param words List of similiar words
+     */
     private void throwAlert(String string, ObservableList<String> words)
     {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

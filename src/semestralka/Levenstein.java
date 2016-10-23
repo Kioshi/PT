@@ -1,10 +1,17 @@
 package semestralka;
 
 /**
- * Created by Stepan on 13.10.2016.
+ * Created by Martinek on 13.10.2016.
+ *
  */
-public class Levenshtein
+class Levenstein
 {
+    /**
+     * Calculates Levenstein distance of two strings without recursion
+     * @param s1 First string
+     * @param s2 Second string
+     * @return distance of strings
+     */
     static int distance(final String s1, final String s2)
     {
         final int len1 = s1.length();

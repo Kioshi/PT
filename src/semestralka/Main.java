@@ -2,11 +2,16 @@ package semestralka;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-
 import java.io.FileNotFoundException;
+
+
 
 public class Main extends Application{
 
+    /**
+     * Launch gui
+     * @param args argument
+     */
     public static void main(String[] args) throws FileNotFoundException
     {
         launch(args);

@@ -21,15 +21,32 @@ import java.util.stream.Stream;
  */
 class Trie
 {
+    /**
+     * Root node of trie
+     */
     private Node root = new Node("",null);
+    /**
+     * Lock that allow async use of trie (for preventing freeze of gui)
+     */
     private ReentrantLock lock = new ReentrantLock();
+    /**
+     * List of words contained in trie
+     */
     private ObservableList<String> words = FXCollections.observableArrayList();
 
+    /**
+     * Getter for words
+     * @return words contained in trie
+     */
     ObservableList<String> getWords()
     {
         return words;
     }
 
+    /**
+     * Insert key without value for dictionary building
+     * @param key Key word
+     */
     void insert(String key)
     {
         if (key.length() == 0)
@@ -39,6 +56,11 @@ class Trie
         lock.unlock();
     }
 
+    /**
+     * Insert key with value
+     * @param key Key word
+     * @param value index of word
+     */
     void insert(String key, int value)
     {
         lock.lock();
@@ -48,6 +70,11 @@ class Trie
         lock.unlock();
     }
 
+    /**
+     * Find and return indexes of key
+     * @param key Key word
+     * @return Returns null if key is not as word in dictionary, List[size==0] if key is in dictionary, List[size>0] if key is in text
+     */
     List<Integer> find(String key)
     {
         lock.lock();
@@ -56,7 +83,9 @@ class Trie
         return list;
     }
 
-
+    /**
+     * Clear indexes of words in trie
+     */
     void clearValues()
     {
         lock.lock();
@@ -64,11 +93,18 @@ class Trie
         lock.unlock();
     }
 
+    /**
+     * Calls print on standat output
+     */
     void print()
     {
         print(System.out);
     }
 
+    /**
+     * Print trie on specified print stream
+     * @param ps PrintStream
+     */
     void print(PrintStream ps)
     {
         lock.lock();
@@ -77,9 +113,15 @@ class Trie
         lock.unlock();
     }
 
+    /**
+     * Load trie from dictionary file with specific syntax
+     * @param f file to load from
+     */
     void load(File f)
     {
         lock.lock();
+        root = new Node("",null);
+        words.clear();
         try (Stream<String> lines = Files.lines(Paths.get(f.getPath()), Charset.defaultCharset())) {
             lines.forEachOrdered(line ->
             {
@@ -109,6 +151,10 @@ class Trie
         lock.unlock();
     }
 
+    /**
+     * Create trie dictionary from text file
+     * @param f file
+     */
     void create(File f)
     {
         lock.lock();
@@ -126,6 +172,10 @@ class Trie
         lock.unlock();
     }
 
+    /**
+     * Validate if every child of root start with different character
+     * @return true for valid trie false for invalid
+     */
     public boolean validate()
     {
         lock.lock();
@@ -137,10 +187,24 @@ class Trie
 
 class Node
 {
+    /**
+     * Prefix of this node
+     */
     private String prefix;
+    /**
+     * List of childs
+     */
     private List<Node> childs = new ArrayList<>();
+    /**
+     * List of indexers, can be null
+     */
     private List<Integer> values;
 
+    /**
+     * Standart constructor
+     * @param prefix Prefix of this node
+     * @param value can be null
+     */
     public Node(String prefix, Integer value)
     {
         this.prefix = prefix;
@@ -151,6 +215,12 @@ class Node
             values.add(value);
     }
 
+    /**
+     * Copy constructor that make node with new prefix and values and childs of old node
+     * @param prefix Prefix of this node
+     * @param values Values of node
+     * @param childs Childs of node
+     */
     public Node(String prefix, List<Integer> values, List<Node> childs)
     {
         this.prefix = prefix;
@@ -165,6 +235,13 @@ class Node
             this.childs.add(c);
     }
 
+    /**
+     * Insert method that try to insert key to node
+     * @param key Inserted key word
+     * @param value index of key
+     * @param curr Current string made from parents prefixes
+     * @return true if inserted, false if not valid
+     */
     boolean insert(String key, Integer value, String curr)
     {
         String n = curr + prefix;
@@ -174,9 +251,16 @@ class Node
             return notFound(key,n,value,curr);
     }
 
+    /**
+     * Mathod that will try split current node and insert to longes valid prefix
+     * @param key Inserted key word
+     * @param n Current value + prefix
+     * @param value index of key
+     * @param curr Current string made from parents prefixes
+     * @return true if inserted, false if not valid
+     */
     private boolean notFound(String key, String n, Integer value, String curr)
     {
-
         for (int i = prefix.length(); i > 0; i--)
         {
             String ne = curr+ prefix.substring(0,i);
@@ -196,6 +280,14 @@ class Node
         return false;
     }
 
+    /**
+     * Mathod that will try insert into current node, or split and insert if necessary
+     * @param key Inserted key word
+     * @param n Current value + prefix
+     * @param value Index of key
+     * @param curr Current string made from parents prefixes
+     * @return true if inserted, false if not valid
+     */
     private boolean found(String key, String n, Integer value, String curr)
     {
         if (key.length() == n.length())
@@ -219,6 +311,11 @@ class Node
 
     }
 
+    /**
+     * Split node
+     * @param newName name of new node
+     * @param newPrefix new name of current node
+     */
     private void split(String newName, String newPrefix)
     {
         Node node = new Node(newName, values, childs);
@@ -229,6 +326,10 @@ class Node
 
     }
 
+    /**
+     * Add value to current node
+     * @param value index of key
+     */
     private void addValue(Integer value)
     {
         if (values == null)
@@ -237,6 +338,12 @@ class Node
             values.add(value);
     }
 
+    /**
+     * Tries to find key in this node and its childrens
+     * @param key Key word we are looking for
+     * @param curr Current string made from parent prefixes
+     * @return List of indexes
+     */
     List<Integer> find(String key, String curr)
     {
         String n = curr + prefix;
@@ -255,6 +362,9 @@ class Node
         return null;
     }
 
+    /**
+     * Clears indexes of node and childrens
+     */
     void clear()
     {
         if (values != null)
@@ -263,6 +373,11 @@ class Node
             node.clear();
     }
 
+    /**
+     * Prints current node and childrens into PrintStream
+     * @param floor Current recursion level for formating
+     * @param ps PrintStream
+     */
     void print(int floor, PrintStream ps)
     {
         for (int i=0;i<floor;i++)
@@ -283,22 +398,13 @@ class Node
             child.print(floor+1, ps);
     }
 
-    private List<String> getWorld(String curr)
-    {
-        List<String> list = new ArrayList<>();
-        String word = curr + prefix;
-        if (values != null)
-            list.add(word);
-
-        for (Node child : childs)
-        {
-            List<String> res = child.getWorld(word);
-            if (res.size() != 0)
-                list.addAll(res);
-        }
-        return list;
-    }
-
+    /**
+     * Load prefix into trie
+     * @param prefix prefix of node
+     * @param values indexes of key word
+     * @param i Level of recursion
+     * @param pIndex Index we are looking for
+     */
     void load(String prefix, List<Integer> values, int i, int pIndex)
     {
         if (i >= pIndex)
@@ -309,6 +415,10 @@ class Node
         childs.get(childs.size() - 1).load(prefix,values, i+1, pIndex);
     }
 
+    /**
+     * Check if childs are valid
+     * @return true if valid else false
+     */
     boolean validate()
     {
         List<Character> chars = new ArrayList<>();
