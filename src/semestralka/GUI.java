@@ -18,7 +18,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
@@ -31,6 +34,7 @@ public class GUI {
     private static StyleClassedTextArea taText;
     private TextField tfSearch;
     private File dictFile;
+    private boolean textChanged = false;
     Trie trie = new Trie();
 
 
@@ -55,10 +59,7 @@ public class GUI {
 
     private Node getText() {
         taText = new StyleClassedTextArea();
-        //taText.setParagraphGraphicFactory(LineNumberFactory);
-  /*      taText.setPrefColumnCount(30);
-        taText.setPrefRowCount(30);
-*/
+        taText.setOnKeyTyped(event -> textChanged = true);
         taText.maxWidth(100);
         return taText;
     }
@@ -255,6 +256,23 @@ public class GUI {
         if (string.isEmpty())
             return;
 
+        updateDictionary();
+
+        List<Integer> indexes = trie.find(string);
+        taText.clearStyle(0,taText.getLength());
+        if (indexes != null)
+            for (int index : indexes)
+                taText.setStyle(index, index+string.length(), Arrays.asList("bold"));
+        else
+            throwAlert(string,findSimiliar(string));
+    }
+
+    void updateDictionary()
+    {
+        if (!textChanged)
+            return;
+
+        textChanged = false;
         String text = taText.getText().replaceAll("[^a-zA-Z ]", " ").toLowerCase();
         int start = -1;
         int end = -1;
@@ -263,10 +281,7 @@ public class GUI {
             if (text.charAt(i) == ' ')
             {
                 if (end != -1 && end == i-1)
-                {
-                    //System.out.println(text.substring(start,end+1) +" "+start);
                     trie.insert(text.substring(start,end+1),start);
-                }
 
                 start = -1;
                 end = -1;
@@ -279,26 +294,7 @@ public class GUI {
         }
 
         if (end != -1 && end == text.length()-1)
-        {
-            //System.out.println(text.substring(start,end+1) +" "+start);
             trie.insert(text.substring(start,end+1),start);
-        }
-
-        List<Integer> indexes = trie.find(string);
-        taText.clearStyle(0,taText.getLength());
-        //ArrayList<String> style = new ArrayList<>();
-        //style.add("-fx-fill: \"red\"");
-        if (indexes != null)
-        {
-            //hajlajt
-            for (int index : indexes)
-            {
-                //System.out.println(index);
-                taText.setStyle(index, index+string.length(), Arrays.asList("bold"));
-            }
-        }
-        else
-            throwAlert(string,findSimiliar(string));
     }
 
     ObservableList<String> findSimiliar(String word)

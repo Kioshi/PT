@@ -1,0 +1,1 @@
+pmd-bin-5.5.1/bin/pmd -d ..\src\semestralka -f text -R pmdrules.xml > pmd.txt

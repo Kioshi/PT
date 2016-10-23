@@ -176,41 +176,20 @@ class Node
     {
         String n = curr + prefix;
         if (key.indexOf(n) == 0)
-        {
-            if (key.length() == n.length())
-            {
-                if (value != null)
-                    addValue(value);
-                return true;
-            }
-            else if (key.length() < n.length())
-            {
-                Node node = new Node(prefix, values, childs);
-                prefix = key.substring(curr.length());
-                values.clear();
-                addValue(value);
-                childs.clear();
-                childs.add(node);
-                return true;
-            }
+            return found(key,n,value,curr);
+        else
+            return notFound(key,n,value,curr);
+    }
 
-            for (Node child : childs)
-                if (child.insert(key,value,n))
-                    return true;
-            childs.add(new Node(key.substring(n.length()),value));
-            return true;
-        }
+    boolean notFound(String key, String n, Integer value, String curr)
+    {
 
         for (int i = prefix.length(); i > 0; i--)
         {
             String ne = curr+ prefix.substring(0,i);
             if (key.indexOf(ne) == 0)
             {
-                Node node = new Node(n.substring(ne.length()), values, childs);
-                prefix = ne.substring(curr.length());
-                values = null;
-                childs.clear();
-                childs.add(node);
+                split(n.substring(ne.length()),ne.substring(curr.length()));
                 if (ne.length() == key.length())
                 {
                     addValue(value);
@@ -222,6 +201,39 @@ class Node
             }
         }
         return false;
+    }
+
+    boolean found(String key, String n, Integer value, String curr)
+    {
+        if (key.length() == n.length())
+        {
+            if (value != null)
+                addValue(value);
+            return true;
+        }
+        else if (key.length() < n.length())
+        {
+            split(prefix,key.substring(curr.length()));
+            addValue(value);
+            return true;
+        }
+
+        for (Node child : childs)
+            if (child.insert(key,value,n))
+                return true;
+        childs.add(new Node(key.substring(n.length()),value));
+        return true;
+
+    }
+
+    private void split(String newName, String newPrefix)
+    {
+        Node node = new Node(newName, values, childs);
+        prefix = newPrefix;
+        values = null;
+        childs.clear();
+        childs.add(node);
+
     }
 
     private void addValue(Integer value)
