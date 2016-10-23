@@ -1,3 +1,6 @@
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -16,13 +19,20 @@ public class Trie
 {
     Node root = new Node("",null);
     ReentrantLock lock = new ReentrantLock();
-    //ReentrantLock fileLock = new ReentrantLock();
+    ObservableList<String> words = FXCollections.observableArrayList();
+
+    ObservableList<String> getWords()
+    {
+        return words;
+    }
 
     void insert(String key)
     {
         if (key.length() == 0)
             return;
         lock.lock();
+        if (!words.contains(key))
+            words.add(key);
         root.insert(key,null,"");
         lock.unlock();
     }
@@ -30,6 +40,8 @@ public class Trie
     void insert(String key, int value)
     {
         lock.lock();
+        if (!words.contains(key))
+            words.add(key);
         root.insert(key, value, "");
         lock.unlock();
     }
@@ -41,13 +53,13 @@ public class Trie
         lock.unlock();
         return list;
     }
-    ArrayList<String> getWorlds()
+    /*ArrayList<String> getWorlds()
     {
         lock.lock();
         ArrayList<String> list = root.getWorld("");
         lock.unlock();
         return list;
-    }
+    }*/
 
 
     void clearValues()
@@ -93,9 +105,9 @@ public class Trie
                         values.add(scanner.nextInt());
                 }
 
-                //lock.lock();
+                if (values != null && !words.contains(prefix))
+                    words.add(prefix);
                 root.load(prefix,values, 1, pIndex);
-                //lock.unlock();
             });
         } catch (IOException e)
         {
@@ -216,7 +228,7 @@ class Node
     {
         if (values == null)
             values = new ArrayList<>();
-        if (value != null)
+        if (value != null && !values.contains(value))
             values.add(value);
     }
 
@@ -280,14 +292,6 @@ class Node
                 list.addAll(res);
         }
         return list;
-    }
-
-    public int getMaxDepth(int depth)
-    {
-        int d = depth;
-        for (Node child:childs)
-            d = Math.max(d, child.getMaxDepth(depth + 1));
-        return d;
     }
 
     public void load(String prefix, ArrayList<Integer> values, int i, int pIndex)

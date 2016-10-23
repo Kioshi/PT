@@ -216,7 +216,6 @@ public class GUI {
         {
             if (!tfAdd.getText().isEmpty())
                 trie.insert(tfAdd.getText());
-            //listView.getItems().add(tfAdd.getText())
         });
         paneDictControl.add(buttonAdd,1,2);
 
@@ -244,7 +243,7 @@ public class GUI {
     }
 
     private ListView seznam() {
-        listView = new ListView<String>();
+        listView = new ListView<String>(trie.getWords());
         listView.setEditable(false);
         //listView.setCellFactory(TextFieldListCell.forListView());
         BorderPane.setMargin(listView, new Insets(5));
@@ -268,7 +267,7 @@ public class GUI {
             {
                 if (end != -1 && end == i-1)
                 {
-                    System.out.println(text.substring(start,end+1) +" "+start);
+                    //System.out.println(text.substring(start,end+1) +" "+start);
                     trie.insert(text.substring(start,end+1),start);
                 }
 
@@ -284,7 +283,7 @@ public class GUI {
 
         if (end != -1 && end == text.length()-1)
         {
-            System.out.println(text.substring(start,end+1) +" "+start);
+            //System.out.println(text.substring(start,end+1) +" "+start);
             trie.insert(text.substring(start,end+1),start);
         }
 
@@ -299,13 +298,11 @@ public class GUI {
             {
                 System.out.println(index);
                 taText.setStyle(index, index+string.length(), Arrays.asList("bold"));
-
-               // taText.g
             }
         }
         else
         {
-            ArrayList<String> words = trie.getWorlds();
+            ObservableList<String> words = trie.getWords();
 
             ConcurrentHashMap<String,Integer> map = new ConcurrentHashMap<>(words.size());
             words.stream().parallel().forEach(s -> map.put(s,Levenshtein.distance(s,string)));
