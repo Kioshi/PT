@@ -16,13 +16,14 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 /**
- * Created by Stepan on 7.10.2016.
+ * Created by Martinek on 7.10.2016.
+ *
  */
-public class Trie
+class Trie
 {
-    Node root = new Node("",null);
-    ReentrantLock lock = new ReentrantLock();
-    ObservableList<String> words = FXCollections.observableArrayList();
+    private Node root = new Node("",null);
+    private ReentrantLock lock = new ReentrantLock();
+    private ObservableList<String> words = FXCollections.observableArrayList();
 
     ObservableList<String> getWords()
     {
@@ -54,13 +55,6 @@ public class Trie
         lock.unlock();
         return list;
     }
-    /*ArrayList<String> getWorlds()
-    {
-        lock.lock();
-        ArrayList<String> list = root.getWorld("");
-        lock.unlock();
-        return list;
-    }*/
 
 
     void clearValues()
@@ -83,8 +77,7 @@ public class Trie
         lock.unlock();
     }
 
-    //public void load(String s)
-    public void load(File f)
+    void load(File f)
     {
         lock.lock();
         try (Stream<String> lines = Files.lines(Paths.get(f.getPath()), Charset.defaultCharset())) {
@@ -116,7 +109,7 @@ public class Trie
         lock.unlock();
     }
 
-    public void create(File f)
+    void create(File f)
     {
         lock.lock();
         try (Stream<String> lines = Files.lines(Paths.get("big.txt"), Charset.defaultCharset())) {
@@ -144,9 +137,9 @@ public class Trie
 
 class Node
 {
-    String prefix;
-    List<Node> childs = new ArrayList<>();
-    List<Integer> values;
+    private String prefix;
+    private List<Node> childs = new ArrayList<>();
+    private List<Integer> values;
 
     public Node(String prefix, Integer value)
     {
@@ -172,7 +165,7 @@ class Node
             this.childs.add(c);
     }
 
-    public boolean insert(String key, Integer value, String curr)
+    boolean insert(String key, Integer value, String curr)
     {
         String n = curr + prefix;
         if (key.indexOf(n) == 0)
@@ -181,7 +174,7 @@ class Node
             return notFound(key,n,value,curr);
     }
 
-    boolean notFound(String key, String n, Integer value, String curr)
+    private boolean notFound(String key, String n, Integer value, String curr)
     {
 
         for (int i = prefix.length(); i > 0; i--)
@@ -203,7 +196,7 @@ class Node
         return false;
     }
 
-    boolean found(String key, String n, Integer value, String curr)
+    private boolean found(String key, String n, Integer value, String curr)
     {
         if (key.length() == n.length())
         {
@@ -262,7 +255,7 @@ class Node
         return null;
     }
 
-    public void clear()
+    void clear()
     {
         if (values != null)
             values.clear();
@@ -270,7 +263,7 @@ class Node
             node.clear();
     }
 
-    public void print(int floor, PrintStream ps)
+    void print(int floor, PrintStream ps)
     {
         for (int i=0;i<floor;i++)
             ps.print("|");
@@ -290,7 +283,7 @@ class Node
             child.print(floor+1, ps);
     }
 
-    List<String> getWorld(String curr)
+    private List<String> getWorld(String curr)
     {
         List<String> list = new ArrayList<>();
         String word = curr + prefix;
@@ -306,17 +299,17 @@ class Node
         return list;
     }
 
-    public void load(String prefix, List<Integer> values, int i, int pIndex)
+    void load(String prefix, List<Integer> values, int i, int pIndex)
     {
         if (i >= pIndex)
         {
-            childs.add(new Node(prefix, values, new ArrayList<Node>()));
+            childs.add(new Node(prefix, values, new ArrayList<>()));
             return;
         }
         childs.get(childs.size() - 1).load(prefix,values, i+1, pIndex);
     }
 
-    public boolean validate()
+    boolean validate()
     {
         List<Character> chars = new ArrayList<>();
         for (Node child: childs)

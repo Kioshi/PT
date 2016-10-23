@@ -18,15 +18,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
 /**
- * Created by user on 19.10.2016.
+ * Created by Kalivoda on 19.10.2016.
+ *
  */
 public class GUI {
     private static Stage primaryStage;
@@ -35,10 +33,15 @@ public class GUI {
     private TextField tfSearch;
     private File dictFile;
     private boolean textChanged = false;
-    Trie trie = new Trie();
+    private Trie trie = new Trie();
+
+    public GUI(Stage primaryStage)
+    {
+        GUI.primaryStage = primaryStage;
+    }
 
 
-    public Scene getScene() {
+    Scene getScene() {
         Scene scene = new Scene(getRoot());
         scene.getStylesheets().add("semestralka/style.css");
         return scene;
@@ -47,13 +50,8 @@ public class GUI {
     private Parent getRoot() {
         BorderPane rootPaneBP = new BorderPane();
 
-        // adding child elements to the BorderPane, on the specific locations
         rootPaneBP.setCenter(getText());
-        //rootPaneBP.setRight(getButtonPane());
-       // rootPaneBP.setLeft(getTogglePane());
         rootPaneBP.setBottom(getControl());
-       // rootPaneBP.setTop(getMenu());
-
         return rootPaneBP;
     }
 
@@ -69,11 +67,6 @@ public class GUI {
         controls.setHgap(10);
         controls.setVgap(10);
 
-        /*
-        Text labelDescSearch = new Text("Search: ");
-        labelDescSearch.setFont(Font.font("Arial", FontWeight.BOLD, 13));
-        controls.add(labelDescSearch,1,1);
-        */
         tfSearch = new TextField();
         controls.add(tfSearch,1,1);
 
@@ -107,49 +100,8 @@ public class GUI {
                 else
                     trie.create(file);
             });
-            /*
-            String data = loadFile(file);
-            if ((data != null) && (data.length() > 0)) {
-                taText.setText(data);
-            } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setContentText("Can't load any data from the file!");
-                alert.setTitle("Loading error");
-                alert.setHeaderText("ERROR!");
-                alert.showAndWait();
-            }*/
         }
     }
-/*
-    private String loadFile(File file) {
-        ObservableList<String> newData = FXCollections.observableArrayList();
-        String data;
-        if (file == null) {
-            return null;
-        } else {
-
-            FileReader reader;
-            BufferedReader input;
-            try {
-                reader = new FileReader(file);
-                input = new BufferedReader(reader);
-
-
-                for (String line = input.readLine(); line != null; line = input.readLine()) {
-                    newData.add(line);
-                }
-
-                input.close();
-                reader.close();
-            } catch (IOException e) {
-                return null;
-            }
-            data = newData.toString();
-            return data;
-        }
-
-    }
-*/
     private void getDictStage()
     {
 
@@ -159,8 +111,7 @@ public class GUI {
         stageDict.show();
     }
     private Scene getDictScene() {
-        Scene sceneDict = new Scene(getDictRoot());
-        return sceneDict;
+        return new Scene(getDictRoot());
     }
 
     private Parent getDictRoot(){
@@ -179,17 +130,8 @@ public class GUI {
         MenuItem save = new MenuItem("Save");
         MenuItem saveAs = new MenuItem("Save As");
 
-        //Button buttonOpen = new Button("Open...");
-        //paneDictControl.add(buttonOpen,0,1);
         open.setOnAction(event -> loadData());
-
-
-        //Button buttonSave = new Button("Save");
-        //buttonSave.add(buttonSave,1,1);
         save.setOnAction(event -> save(false));
-
-        //Button buttonSaveAs = new Button("Save As");
-        //paneDictControl.add(buttonSaveAs,2,1);
         saveAs.setOnAction(event -> save(true));
 
         menuFile.getItems().addAll(open,save,saveAs);
@@ -202,10 +144,6 @@ public class GUI {
         GridPane paneDictControl = new GridPane();
         paneDictControl.setHgap(10);
         paneDictControl.setVgap(10);
-
-        /*Text labelDescAdd = new Text("Add word: ");
-        labelDescAdd.setFont(Font.font("Arial", FontWeight.BOLD, 13));
-        paneDictControl.add(labelDescAdd,3,1);*/
 
         TextField tfAdd = new TextField();
         paneDictControl.add(tfAdd,0,2);
@@ -242,9 +180,8 @@ public class GUI {
     }
 
     private ListView seznam() {
-        ListView listView = new ListView<String>(trie.getWords());
+        ListView listView = new ListView<>(trie.getWords());
         listView.setEditable(false);
-        //listView.setCellFactory(TextFieldListCell.forListView());
         BorderPane.setMargin(listView, new Insets(5));
 
         return listView;
@@ -262,12 +199,14 @@ public class GUI {
         taText.clearStyle(0,taText.getLength());
         if (indexes != null)
             for (int index : indexes)
-                taText.setStyle(index, index+string.length(), Arrays.asList("bold"));
+            {
+                taText.setStyle(index, index + string.length(), Collections.singletonList("bold"));
+            }
         else
             throwAlert(string,findSimiliar(string));
     }
 
-    void updateDictionary()
+    private void updateDictionary()
     {
         if (!textChanged)
             return;
@@ -297,14 +236,14 @@ public class GUI {
             trie.insert(text.substring(start,end+1),start);
     }
 
-    ObservableList<String> findSimiliar(String word)
+    private ObservableList<String> findSimiliar(String word)
     {
         ObservableList<String> words = trie.getWords();
 
         ConcurrentHashMap<String,Integer> map = new ConcurrentHashMap<>(words.size());
         words.stream().parallel().forEach(s -> map.put(s,Levenshtein.distance(s,word)));
 
-        TreeMap<String, Integer> sorted_map = new TreeMap<String, Integer>((a, b) ->
+        TreeMap<String, Integer> sorted_map = new TreeMap<>((a, b) ->
         {
             if (map.get(a) < map.get(b))
                 return -1;
@@ -324,7 +263,7 @@ public class GUI {
         return simWords;
     }
 
-    void throwAlert(String string,ObservableList<String> words)
+    private void throwAlert(String string, ObservableList<String> words)
     {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Word not found in text");
