@@ -5,25 +5,28 @@ package semestralka;
  */
 public class Levenshtein
 {
-    public static int distance(String s, String t)
+    static int distance(final String s1, final String s2)
     {
-        int cost;
-        final int len_s = s.length();
-        final int len_t = t.length();
+        final int len1 = s1.length();
+        final int len2 = s2.length();
 
-  /* base case: empty strings */
-        if (len_s == 0) return len_t;
-        if (len_t == 0) return len_s;
+        int[] col = new int[len2+1];
+        int[] prevCol = new int[len2+1];
 
-  /* test if last characters of the strings match */
-        if (s.charAt(len_s-1) == t.charAt(len_t-1))
-            cost = 0;
-        else
-            cost = 1;
+        for (int i = 0; i < prevCol.length; ++i)
+            prevCol[i] = i;
 
-  /* return minimum of delete char from s, delete char from t, and delete char from both */
-        return Math.min(Math.min(distance(s.substring(0,len_s-1), t) + 1,
-                distance(s, t.substring(0, len_t - 1)) + 1),
-                distance(s.substring(0, len_s - 1), t.substring(0, len_t - 1)) + cost);
+        for (int i = 0; i < len1; ++i)
+        {
+            col[0] = i+1;
+            for (int j = 0; j < len2; ++j)
+                col[j + 1] = Math.min( Math.min( 1 + col[j], 1 + prevCol[1 + j]), prevCol[j] + (s1.charAt(i) == s2.charAt(j) ? 0 : 1));
+
+            int[] tmp = col;
+            col = prevCol;
+            prevCol = tmp;
+        }
+
+        return prevCol[len2];
     }
 }
