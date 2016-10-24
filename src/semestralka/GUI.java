@@ -2,6 +2,7 @@ package semestralka;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -12,6 +13,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
 import java.io.File;
@@ -63,6 +65,12 @@ public class GUI {
     public GUI(Stage primaryStage)
     {
         GUI.primaryStage = primaryStage;
+
+        primaryStage.setOnCloseRequest(we ->
+        {
+            if (stageDict != null)
+                stageDict.close();
+        });
     }
 
     /**
@@ -148,15 +156,16 @@ public class GUI {
     /**
      * Create dictionary stage
      */
-    private void getDictStage()
-    {
+    private void getDictStage() {
+        if (stageDict != null)
+            return;
         stageDict = new Stage();
         stageDict.setTitle("Dictionary");
         stageDict.setScene(getDictScene());
         stageDict.show();
+        stageDict.setOnCloseRequest(we -> stageDict = null);
     }
-
-    /**
+     /**
      * Create dictionary scene
      * @return Scene
      */
