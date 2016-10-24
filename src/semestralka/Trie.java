@@ -52,6 +52,8 @@ class Trie
         if (key.length() == 0)
             return;
         lock.lock();
+        if (!words.contains(key))
+            words.add(key);
         root.insert(key,null,"");
         lock.unlock();
     }

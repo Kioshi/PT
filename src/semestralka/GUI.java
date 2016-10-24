@@ -229,17 +229,20 @@ public class GUI {
      */
     private void save(boolean saveAs)
     {
-        if (dictFile == null || saveAs)
-        {
-            FileChooser fileChooser = new FileChooser();
-            File dictFile = fileChooser.showOpenDialog(stageDict);
-            if (dictFile == null)
-                return;
-        }
         try
         {
+            if (dictFile == null || saveAs)
+            {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Trie dictionary file (*.dic)","*.dic"));
+                File dictFile = fileChooser.showSaveDialog(primaryStage);
+                if (dictFile != null)
+                    trie.print(new PrintStream(new FileOutputStream(dictFile)));
+                return;
+            }
             trie.print(new PrintStream(new FileOutputStream(dictFile)));
-        } catch (FileNotFoundException e)
+        }
+        catch (FileNotFoundException e)
         {
             e.printStackTrace();
         }
