@@ -2,7 +2,6 @@ package semestralka;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -13,16 +12,17 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 
 /**
  * Created by Kalivoda on 19.10.2016.
@@ -140,7 +140,7 @@ public class GUI {
         File file = fileChooser.showOpenDialog(primaryStage);
         if (file != null)
         {
-            Executors.newSingleThreadExecutor().submit(() ->
+            //Executors.newSingleThreadExecutor().submit(() ->
             {
                 if (file.getName().matches(".*\\.dic$"))
                 {
@@ -149,7 +149,9 @@ public class GUI {
                 }
                 else
                     trie.create(file);
-            });
+                
+                textChanged = true;
+            }//);
         }
     }
 

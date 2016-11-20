@@ -2,3 +2,5 @@
 out/production/semestralka/Main.class
 out/production/semestralka/Node.class
 out/production/semestralka/Trie.class
+
+out/production/*
