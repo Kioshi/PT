@@ -137,6 +137,7 @@ public class GUI {
         File file = fileChooser.showOpenDialog(primaryStage);
         if (file != null)
         {
+            textChanged = true;
             ObservableList<String> data = readFile(file);
             if ((data != null) && (data.size() > 0))
             {
