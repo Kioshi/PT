@@ -28,11 +28,11 @@ class Trie
     /**
      * Lock that allow async use of trie (for preventing freeze of gui)
      */
-    private ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
     /**
      * List of words contained in trie
      */
-    private ObservableList<String> words = FXCollections.observableArrayList();
+    private final ObservableList<String> words = FXCollections.observableArrayList();
 
     /**
      * Getter for words

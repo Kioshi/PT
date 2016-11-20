@@ -35,12 +35,12 @@ Pravidla pro KIV/PT, R.Moucek 16.11.2012, lehce modifikovano z P. Herout - pravi
   <rule ref="rulesets/java/unnecessary.xml/UselessOverridingMethod" message="Zbytecne pretezovani metody predka."> </rule>
   <rule ref="rulesets/java/unnecessary.xml/UselessOperationOnImmutable" message="Operace na nemennych objektech (BigDecimal, BigInteger, ...) nemeni obsah objektu - vysledek priradte."> </rule>
 
-  <!--
+
   <rule ref="rulesets/java/braces.xml/IfStmtsMustUseBraces" message="Nepouzivejte prikaz 'if' bez slozenych zavorek"> </rule>
   <rule ref="rulesets/java/braces.xml/WhileLoopsMustUseBraces" message="Nepouzivejte prikaz 'while' bez slozenych zavorek"> </rule>
   <rule ref="rulesets/java/braces.xml/IfElseStmtsMustUseBraces" message="Nepouzivejte vetev 'else' bez slozenych zavorek"> </rule>
   <rule ref="rulesets/java/braces.xml/ForLoopsMustUseBraces" message="Nepouzivejte prikaz 'for' bez slozenych zavorek"> </rule>
-  -->
+
   <rule ref="rulesets/java/codesize.xml/NPathComplexity" message="Ruznych cest pruchodu metodou ''{0}()'' je {1}, doporuceny limit je 200 (NPath complexity)."> </rule>
   <rule ref="rulesets/java/codesize.xml/ExcessiveMethodLength" message="Vyhnete se prilis dlouhym metodam."> </rule>
   <rule ref="rulesets/java/codesize.xml/ExcessiveParameterList" message="Nepouzivejte metody, ktere maji prilis mnoho parametru (limit=10)."> </rule>

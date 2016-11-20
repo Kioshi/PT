@@ -32,7 +32,7 @@ public class GUI {
     /**
      * Primary stage for alert dialog
      */
-    private static Stage primaryStage;
+    private Stage primaryStage;
     /**
      * Dictionary window stage
      */
@@ -56,16 +56,14 @@ public class GUI {
     /**
      * Trie used for dictionary and searching
      */
-    private Trie trie = new Trie();
+    private final Trie trie = new Trie();
 
     /**
      * Constructor for retrieving primaryStage
      * @param primaryStage Primary stage
      */
-    public GUI(Stage primaryStage)
+    public GUI(final Stage primaryStage)
     {
-        GUI.primaryStage = primaryStage;
-
         primaryStage.setOnCloseRequest(we ->
         {
             if (stageDict != null)
