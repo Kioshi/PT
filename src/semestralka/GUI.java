@@ -14,14 +14,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.fxmisc.richtext.StyleClassedTextArea;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.*;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -124,10 +118,67 @@ public class GUI {
         controls.add(buttonDict,3,1);
         buttonDict.setOnAction(event -> getDictStage());
 
+        Button buttonOpen = new Button("Open");
+        buttonOpen.setOnAction(event -> loadFile());
+        controls.add(buttonOpen,4,1);
+
         controls.setPadding(new Insets(5));
         controls.setAlignment(Pos.CENTER);
 
         return controls;
+    }
+
+
+    /**
+     * Show file chooser and tells trie to create or load dictionary according to file type
+     */
+    private void loadFile(){
+        FileChooser fileChooser = new FileChooser();
+        File file = fileChooser.showOpenDialog(primaryStage);
+        if (file != null)
+        {
+            ObservableList<String> data = readFile(file);
+            if ((data != null) && (data.size() > 0))
+            {
+                String text = data.toString();
+                taText.setWrapText(true);
+                taText.insertText(0,text);
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setContentText("Nepodarilo se nacist zadna data ze souboru!");
+                alert.setTitle("Loading error");
+                alert.setHeaderText("Chyba souboru!");
+                alert.showAndWait();
+                }
+            }
+        }
+
+
+    private ObservableList<String> readFile(File file) {
+        ObservableList<String> newData = FXCollections.observableArrayList();
+
+        if (file == null) {
+            return null;
+        } else {
+            FileReader reader;
+            BufferedReader input;
+            try {
+                reader = new FileReader(file);
+                input = new BufferedReader(reader);
+
+                for (String line = input.readLine(); line != null; line = input.readLine()) {
+                    newData.add(line);
+                }
+
+                input.close();
+                reader.close();
+            } catch (IOException e) {
+                return null;
+            }
+
+            return newData;
+        }
+
     }
 
     /**
