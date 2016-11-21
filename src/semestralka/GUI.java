@@ -60,8 +60,9 @@ public class GUI {
     {
         primaryStage.setOnCloseRequest(we ->
         {
-            if (stageDict != null)
+            if (stageDict != null) {
                 stageDict.close();
+            }
         });
     }
 
@@ -142,6 +143,7 @@ public class GUI {
             if ((data != null) && (data.size() > 0))
             {
                 String text = data.toString();
+                taText.clear();
                 taText.setWrapText(true);
                 taText.insertText(0,text);
             } else {
@@ -155,7 +157,7 @@ public class GUI {
         }
 
     /**
-     * read selected file and load him in observablelist
+     * Read selected file and load him in ObservableList
      */
     private ObservableList<String> readFile(File file) {
         ObservableList<String> newData = FXCollections.observableArrayList();
@@ -199,8 +201,9 @@ public class GUI {
                     trie.load(file);
                     dictFile = file;
                 }
-                else
+                else {
                     trie.create(file);
+                }
                 
                 textChanged = true;
             }//);
@@ -211,8 +214,9 @@ public class GUI {
      * Create dictionary stage
      */
     private void getDictStage() {
-        if (stageDict != null)
+        if (stageDict != null) {
             return;
+        }
         stageDict = new Stage();
         stageDict.setTitle("Dictionary");
         stageDict.setScene(getDictScene());
@@ -276,8 +280,9 @@ public class GUI {
         Button buttonAdd = new Button("Add word");
         buttonAdd.setOnAction(event ->
         {
-            if (!tfAdd.getText().isEmpty())
+            if (!tfAdd.getText().isEmpty()) {
                 trie.insert(tfAdd.getText());
+            }
         });
         paneDictControl.add(buttonAdd,1,2);
 
@@ -299,8 +304,9 @@ public class GUI {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Trie dictionary file (*.dic)","*.dic"));
                 File dictFile = fileChooser.showSaveDialog(primaryStage);
-                if (dictFile != null)
+                if (dictFile != null) {
                     trie.print(new PrintStream(new FileOutputStream(dictFile)));
+                }
                 return;
             }
             trie.print(new PrintStream(new FileOutputStream(dictFile)));
@@ -329,20 +335,22 @@ public class GUI {
     private void search()
     {
         String string = tfSearch.getText();
-        if (string.isEmpty())
+        if (string.isEmpty()) {
             return;
+        }
 
         updateDictionary();
 
         List<Integer> indexes = trie.find(string);
         taText.clearStyle(0,taText.getLength());
-        if (indexes != null)
-            for (int index : indexes)
-            {
+        if (indexes != null) {
+            for (int index : indexes) {
                 taText.setStyle(index, index + string.length(), Collections.singletonList("bold"));
             }
-        else
-            throwAlert(string,findSimiliar(string));
+        }
+        else {
+            throwAlert(string, findSimiliar(string));
+        }
     }
 
     /**
@@ -350,8 +358,9 @@ public class GUI {
      */
     private void updateDictionary()
     {
-        if (!textChanged)
+        if (!textChanged) {
             return;
+        }
 
         textChanged = false;
         String text = taText.getText().replaceAll("[^a-zA-Z ]", " ").toLowerCase();
@@ -361,21 +370,24 @@ public class GUI {
         {
             if (text.charAt(i) == ' ')
             {
-                if (end != -1 && end == i-1)
-                    trie.insert(text.substring(start,end+1),start);
+                if (end != -1 && end == i-1) {
+                    trie.insert(text.substring(start, end + 1), start);
+                }
 
                 start = -1;
                 end = -1;
                 continue;
             }
 
-            if (start == -1)
+            if (start == -1) {
                 start = i;
+            }
             end = i;
         }
 
-        if (end != -1 && end == text.length()-1)
-            trie.insert(text.substring(start,end+1),start);
+        if (end != -1 && end == text.length()-1) {
+            trie.insert(text.substring(start, end + 1), start);
+        }
     }
 
     /**
@@ -392,18 +404,21 @@ public class GUI {
 
         TreeMap<String, Integer> sorted_map = new TreeMap<>((a, b) ->
         {
-            if (map.get(a) < map.get(b))
+            if (map.get(a) < map.get(b)) {
                 return -1;
-            else
+            }
+            else {
                 return 1;
+            }
         });
         sorted_map.putAll(map);
 
         ObservableList<String> simWords = FXCollections.observableArrayList();
         for(Map.Entry<String, Integer> pair: sorted_map.entrySet())
         {
-            if(simWords.size() >= 10)
+            if(simWords.size() >= 10) {
                 break;
+            }
             simWords.add(pair.getKey());
         }
 
