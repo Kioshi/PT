@@ -130,7 +130,7 @@ public class GUI {
 
 
     /**
-     * Show file chooser and tells trie to create or load dictionary according to file type
+     * Show file chooser and load data to textarea
      */
     private void loadFile(){
         FileChooser fileChooser = new FileChooser();
@@ -154,7 +154,9 @@ public class GUI {
             }
         }
 
-
+    /**
+     * read selected file and load him in observablelist
+     */
     private ObservableList<String> readFile(File file) {
         ObservableList<String> newData = FXCollections.observableArrayList();
 

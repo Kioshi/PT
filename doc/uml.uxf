@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>8</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>80</x>
+      <y>328</y>
+      <w>352</w>
+      <h>280</h>
+    </coordinates>
+    <panel_attributes>semestralka::Node
+--
+-prefix: String
+-childs = new ArrayList(): List&lt;Node&gt;
+-values: List&lt;Integer&gt;
+--
++Node(String prefix, Integer value): ctor
++Node(String prefix, List&lt;Integer&gt; values, List&lt;Node&gt; childs): ctor
+~insert(String key, Integer value, String curr): boolean
+-notFound(String key, String n, Integer value, String curr): boolean
+-found(String key, String n, Integer value, String curr): boolean
+-split(String newName, String newPrefix): void
+-addValue(Integer value): void
+~find(String key, String curr): List&lt;Integer&gt;
+~clear(): void
+~print(int floor, PrintStream ps): void
+~load(String prefix, List&lt;Integer&gt; values, int i, int pIndex): void
+~validate(): boolean
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>512</x>
+      <y>168</y>
+      <w>320</w>
+      <h>408</h>
+    </coordinates>
+    <panel_attributes>semestralka::GUI
+--
+-primaryStage: Stage
+-stageDict: Stage
+-taText: StyleClassedTextArea
+-tfSearch: TextField
+-dictFile: File
+-textChanged = false: boolean
+-trie = new Trie(): Trie
+--
++GUI(final Stage primaryStage): ctor
+~getScene(): Scene
+-getRoot(): Parent
+-getText(): Node
+-getControl(): Node
+-loadFile(): void
+-readFile(File file): ObservableList&lt;String&gt;
+-loadData(): void
+-getDictStage(): void
+-getDictScene(): Scene
+-getDictRoot(): Parent
+-newMenu(): Node
+-dicControlPanel(): Node
+-save(boolean saveAs): void
+-getListView(): ListView
+-search(): void
+-updateDictionary(): void
+-findSimiliar(String word): ObservableList&lt;String&gt;
+-throwAlert(String string, ObservableList&lt;String&gt; words): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>928</x>
+      <y>304</y>
+      <w>176</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>semestralka::Main
+--
+--
++main(String[] args): void
++start(Stage primaryStage): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>600</x>
+      <y>16</y>
+      <w>232</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>semestralka::Levenstein
+--
+--
+~distance(final String s1, final String s2): int
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>72</x>
+      <y>0</y>
+      <w>368</w>
+      <h>248</h>
+    </coordinates>
+    <panel_attributes>semestralka::Trie
+--
+-root = new Node("", null): Node
+-lock = new ReentrantLock(): ReentrantLock
+-words = FXCollections.observableArrayList(): ObservableList&lt;String&gt;
+--
+~getWords(): ObservableList&lt;String&gt;
+~insert(String key): void
+~insert(String key, int value): void
+~find(String key): List&lt;Integer&gt;
+~clearValues(): void
+~print(): void
+~print(PrintStream ps): void
+~load(File f): void
+~create(File f): void
++validate(): boolean
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>824</x>
+      <y>336</y>
+      <w>120</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;130.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>712</x>
+      <y>72</y>
+      <w>24</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=1</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;120.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>432</x>
+      <y>64</y>
+      <w>144</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=1
+</panel_attributes>
+    <additional_attributes>10.0;20.0;160.0;20.0;160.0;130.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>224</x>
+      <y>240</y>
+      <w>24</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=1</panel_attributes>
+    <additional_attributes>10.0;110.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>416</x>
+      <y>280</y>
+      <w>72</w>
+      <h>88</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=0..n
+</panel_attributes>
+    <additional_attributes>20.0;90.0;70.0;90.0;70.0;10.0;10.0;10.0;10.0;60.0</additional_attributes>
+  </element>
+</diagram>
